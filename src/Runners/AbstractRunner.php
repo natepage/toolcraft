@@ -15,12 +15,12 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
     /**
      * @var bool
      */
-    private $running = false;
+    protected $running = false;
 
     /**
      * @var bool
      */
-    private $successful = true;
+    protected $successful = true;
 
     /**
      * Check if running.
@@ -49,7 +49,7 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
      */
     public function start(): RunnerInterface
     {
-        $this->startRunning();
+        $this->running = true;
         $this->doStart();
 
         return $this;
@@ -65,7 +65,7 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
     public function wait(): int
     {
         $this->requireRunnerToBeStarted(__FUNCTION__);
-        $this->stopRunning();
+        $this->running = false;
 
         return $this->isSuccessful() ? self::EXIT_CODE_SUCCESS : self::EXIT_CODE_ERROR;
     }
@@ -103,37 +103,5 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
         }
 
         throw new RequireRunnerToBeStartedException(\sprintf('Runner must be started before calling %s.', $function));
-    }
-
-    /**
-     * Start current runner.
-     *
-     * @return void
-     */
-    protected function startRunning(): void
-    {
-        $this->running = true;
-    }
-
-    /**
-     * Stop current runner.
-     *
-     * @return void
-     */
-    protected function stopRunning(): void
-    {
-        $this->running = false;
-    }
-
-    /**
-     * Update runner status, is successful or not.
-     *
-     * @param bool $status
-     *
-     * @return void
-     */
-    protected function updateStatus(bool $status): void
-    {
-        $this->successful = $status;
     }
 }

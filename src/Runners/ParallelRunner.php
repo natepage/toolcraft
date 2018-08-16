@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace NatePage\ToolCraft\Runners;
 
-use NatePage\Standards\Helpers\OutputHelper;
+use NatePage\ToolCraft\Helpers\OutputHelper;
 use NatePage\ToolCraft\Interfaces\ConsoleAwareInterface;
 use NatePage\ToolCraft\Outputs\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -37,7 +37,7 @@ class ParallelRunner extends AbstractAggregateRunner
 
                 // If at least one runner is not successful, then chain not successful
                 if ($runner->isSuccessful() === false) {
-                    $this->updateStatus(self::STATUS_ERROR);
+                    $this->successful = false;
                 }
 
                 // Remove runner from the list of runners currently running
@@ -103,7 +103,7 @@ class ParallelRunner extends AbstractAggregateRunner
     /**
      * Get output helper.
      *
-     * @return \NatePage\Standards\Helpers\OutputHelper
+     * @return \NatePage\ToolCraft\Helpers\OutputHelper
      *
      * @throws \NatePage\ToolCraft\Exceptions\RequiredPropertyMissingException
      */

@@ -50,10 +50,20 @@ class ProcessRunner extends AbstractRunner
     /**
      * {@inheritdoc}
      */
+    public function isRunning(): bool
+    {
+        $this->running = $this->process->isRunning();
+
+        return parent::isRunning();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function wait(): int
     {
         $this->process->wait();
-        $this->updateStatus($this->process->isSuccessful() ? self::STATUS_SUCCESS : self::STATUS_ERROR);
+        $this->successful = $this->process->isSuccessful();
 
         return parent::wait();
     }

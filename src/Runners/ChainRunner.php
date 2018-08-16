@@ -24,7 +24,7 @@ class ChainRunner extends AbstractAggregateRunner
 
             // If at least one runner is not successful, then chain not successful
             if ($runner->isSuccessful() === false) {
-                $this->updateStatus(self::STATUS_ERROR);
+                $this->successful = false;
             }
         }
     }
