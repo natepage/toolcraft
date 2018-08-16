@@ -1,0 +1,22 @@
+{
+    "name": "natepage/toolcraft",
+    "description": "Building cli tools has never been that easy",
+    "type": "package",
+    "license": "MIT",
+    "require": {
+        "php": "^7.1",
+        "symfony/process": "^4.1",
+        "symfony/console": "^4.1"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master",
+        "phpunit/phpunit": "^7.3",
+        "mockery/mockery": "^1.1"
+    },
+    "autoload": {
+        "psr-4": { "NatePage\\ToolCraft\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Tests\\NatePage\\ToolCraft\\": "tests/" }
+    }
+}
