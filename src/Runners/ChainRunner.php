@@ -17,7 +17,7 @@ class ChainRunner extends AbstractAggregateRunner
      */
     protected function doStart(): void
     {
-        foreach ($this->runners as $runner) {
+        foreach ($this->runners->all() as $runner) {
             // Run each runners and wait for each of them
             $runner->start()->wait();
             $runner->close();

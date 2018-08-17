@@ -9,21 +9,21 @@ interface ConfigurationInterface
      * Add configuration option.
      *
      * @param \NatePage\ToolCraft\Interfaces\ConfigurationOptionInterface $option
-     * @param null|string $tool
+     * @param null|string $prefix
      *
      * @return \NatePage\ToolCraft\Interfaces\ConfigurationInterface
      */
-    public function addOption(ConfigurationOptionInterface $option, ?string $tool = null): self;
+    public function addOption(ConfigurationOptionInterface $option, ?string $prefix = null): self;
 
     /**
      * Add multiple configuration options.
      *
      * @param \NatePage\ToolCraft\Interfaces\ConfigurationOptionInterface[] $options
-     * @param null|string $tool
+     * @param null|string $prefix
      *
      * @return \NatePage\ToolCraft\Interfaces\ConfigurationInterface
      */
-    public function addOptions(array $options, ?string $tool = null): self;
+    public function addOptions(array $options, ?string $prefix = null): self;
 
     /**
      * Get flat representation of config.

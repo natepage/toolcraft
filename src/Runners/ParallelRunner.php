@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ParallelRunner extends AbstractAggregateRunner
 {
     /**
-     * @var \NatePage\ToolCraft\Interfaces\RunnerInterface[]
+     * @var \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface[]
      */
     private $currentlyRunning = [];
 
@@ -55,7 +55,7 @@ class ParallelRunner extends AbstractAggregateRunner
      */
     protected function doStart(): void
     {
-        foreach ($this->runners as $runner) {
+        foreach ($this->runners->all() as $runner) {
             // Start each runner and "cache" them
             $this->currentlyRunning[] = $runner->start();
         }

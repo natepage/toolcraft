@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace NatePage\ToolCraft\Interfaces;
+namespace NatePage\ToolCraft\Interfaces\Runners;
 
 interface RunnerInterface
 {
@@ -16,6 +16,20 @@ interface RunnerInterface
      * @return void
      */
     public function close(): void;
+
+    /**
+     * Get tool identifier.
+     *
+     * @return string
+     */
+    public function getId(): string;
+
+    /**
+     * Get tool name.
+     *
+     * @return string
+     */
+    public function getName(): string;
 
     /**
      * Check if running.
@@ -34,7 +48,7 @@ interface RunnerInterface
     /**
      * Start runner instance.
      *
-     * @return \NatePage\ToolCraft\Interfaces\RunnerInterface
+     * @return self
      */
     public function start(): self;
 

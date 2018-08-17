@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace NatePage\ToolCraft\Helpers;
 
-use NatePage\ToolCraft\ConfigurationOption;
-use NatePage\ToolCraft\Interfaces\ConfigurationAwareInterface;
 use NatePage\ToolCraft\Interfaces\ConfigurationInterface;
-use NatePage\ToolCraft\Interfaces\ToolCollectionInterface;
+use NatePage\ToolCraft\Interfaces\Runners\RunnerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -32,19 +30,19 @@ class ConfigurationHelper
      *
      * @param \Symfony\Component\Console\Command\Command $command
      *
-     * @return void
+     * @return self
      */
-    public function addCommandOptions(Command $command): void
+    public function addCommandOptions(Command $command): self
     {
         // Add config options to input options
-        foreach ($this->configuration->getOptions() as $tool => $options) {
+        foreach ($this->configuration->getOptions() as $prefix => $options) {
             /** @var \NatePage\ToolCraft\Interfaces\ConfigurationOptionInterface $option */
             foreach ($options as $option) {
                 if ($option->isExposed() === false) {
                     continue;
                 }
 
-                $key = \is_int($tool) ? $option->getName() : \sprintf('%s.%s', $tool, $option->getName());
+                $key = \is_int($prefix) ? $option->getName() : \sprintf('%s.%s', $prefix, $option->getName());
 
                 $command->addOption(
                     $key,
@@ -55,6 +53,8 @@ class ConfigurationHelper
                 );
             }
         }
+
+        return $this;
     }
 
     /**
@@ -82,92 +82,22 @@ class ConfigurationHelper
     }
 
     /**
-     * Get tool ids.
+     * Pass configuration to given runner if it is aware of the configuration.
      *
-     * @return string[]
+     * @param \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface $runner
+     *
+     * @return \NatePage\ToolCraft\Helpers\ConfigurationHelper
      */
-    public function getToolsId(): array
+    public function handleRunnerOptions(RunnerInterface $runner): self
     {
-        $ids = [];
-
-        foreach ($this->configuration->getOptions() as $toolId => $options) {
-            if (\is_int($toolId)) {
-                continue;
-            }
-
-            $ids[] = $toolId;
-        }
-
-        return $ids;
-    }
-
-    /**
-     * Pass configuration to tools when aware of it.
-     *
-     * @param \NatePage\ToolCraft\Interfaces\ToolCollectionInterface $tools
-     *
-     * @return self
-     */
-    public function registerTools(ToolCollectionInterface $tools): self
-    {
-        if ($tools->isEmpty()) {
+        if (($runner instanceof ConfigurationInterface) === false) {
             return $this;
         }
 
-        foreach ($tools->all() as $tool) {
-            // Add enabled option for each tool by default
-            $this->configuration->addOption(
-                new ConfigurationOption('enabled', true, \sprintf('Enable %s tool', $tool->getName())),
-                $tool->getId()
-            );
-
-            if (($tool instanceof ConfigurationAwareInterface) === false) {
-                continue;
-            }
-
-            /** @var \NatePage\ToolCraft\Interfaces\ConfigurationAwareInterface $tool */
-            $tool->setConfiguration($this->configuration);
-        }
+        /** @var \NatePage\ToolCraft\Interfaces\ConfigurationAwareInterface $runner */
+        $runner->setConfiguration($this->configuration);
 
         return $this;
-    }
-
-    /**
-     * Enable or disable tools based on config.
-     *
-     * @return self
-     *
-     * @throws \NatePage\ToolCraft\Exceptions\InvalidConfigurationOptionException If option doesn't exist
-     */
-    public function updateToolsState(): self
-    {
-        $only = $this->configuration->get('only');
-
-        if ($only === null || empty($only)) {
-            return $this;
-        }
-
-        $only = \explode(',', $only);
-
-        foreach ($this->getToolsId() as $toolId) {
-            $this->configuration->set(\sprintf('%s.enabled', $toolId), \in_array($toolId, $only, true));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Check if given tool is enabled.
-     *
-     * @param string $toolId
-     *
-     * @return bool
-     *
-     * @throws \NatePage\ToolCraft\Exceptions\InvalidConfigurationOptionException If option doesn't exist
-     */
-    public function isToolEnabled(string $toolId): bool
-    {
-        return (bool)$this->configuration->get(\sprintf('%s.enabled', $toolId));
     }
 
     /**

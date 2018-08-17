@@ -42,9 +42,9 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function addOption(ConfigurationOptionInterface $option, ?string $tool = null): ConfigurationInterface
+    public function addOption(ConfigurationOptionInterface $option, ?string $prefix = null): ConfigurationInterface
     {
-        $index = $tool ?? 0;
+        $index = $prefix ?? 0;
 
         if (isset($this->options[$index]) === false) {
             $this->options[$index] = [];
@@ -58,10 +58,10 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function addOptions(array $options, ?string $tool = null): ConfigurationInterface
+    public function addOptions(array $options, ?string $prefix = null): ConfigurationInterface
     {
         foreach ($options as $option) {
-            $this->addOption($option, $tool);
+            $this->addOption($option, $prefix);
         }
 
         return $this;
@@ -125,12 +125,12 @@ class Configuration implements ConfigurationInterface
         $cache = [];
 
         /**
-         * @var int|string $tool
+         * @var int|string $prefix
          * @var \NatePage\ToolCraft\Interfaces\ConfigurationOptionInterface $option
          */
-        foreach ($this->options as $tool => $options) {
+        foreach ($this->options as $prefix => $options) {
             foreach ($options as $option) {
-                $key = \is_int($tool) ? $option->getName() : \sprintf('%s.%s', $tool, $option->getName());
+                $key = \is_int($prefix) ? $option->getName() : \sprintf('%s.%s', $prefix, $option->getName());
 
                 if (\is_bool($option->getDefault())) {
                     $cache[$key] = $this->getBoolValue($key);

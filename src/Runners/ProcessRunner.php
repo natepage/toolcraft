@@ -15,11 +15,15 @@ class ProcessRunner extends AbstractRunner
     /**
      * ProcessRunner constructor.
      *
+     * @param string $id
+     * @param string $name
      * @param \Symfony\Component\Process\Process $process
      */
-    public function __construct(Process $process)
+    public function __construct(string $id, string $name, Process $process)
     {
         $this->process = $process;
+
+        parent::__construct($id, $name);
     }
 
     /**

@@ -43,17 +43,9 @@ class OutputHelper
         $this->style->section('Config');
 
         $dump = $configurationHelper->dump();
-        $toolsId = $configurationHelper->getToolsId();
         $rows = [];
 
         foreach ($dump as $key => $value) {
-            $toolId = \explode('.', $key)[0] ?? null;
-
-            // Skip config for disabled tools
-            if (\in_array($toolId, $toolsId, true) && ($dump[\sprintf('%s.enabled', $toolId)] ?? false) === false) {
-                continue;
-            }
-
             $rows[] = [$key, $this->toString($value)];
         }
 

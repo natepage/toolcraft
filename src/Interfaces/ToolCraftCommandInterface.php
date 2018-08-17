@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace NatePage\ToolCraft\Interfaces;
 
+use NatePage\ToolCraft\Interfaces\Runners\RunnerInterface;
+
 interface ToolCraftCommandInterface
 {
     /**
@@ -15,18 +17,9 @@ interface ToolCraftCommandInterface
     public function setConfiguration(ConfigurationInterface $configuration): self;
 
     /**
-     * Set tools.
-     *
-     * @param \NatePage\ToolCraft\Interfaces\ToolCollectionInterface $tools
-     *
-     * @return \NatePage\ToolCraft\Interfaces\ToolCraftCommandInterface
-     */
-    public function setTools(ToolCollectionInterface $tools): self;
-
-    /**
      * Set runner.
      *
-     * @param \NatePage\ToolCraft\Interfaces\RunnerInterface $runner
+     * @param \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface $runner
      *
      * @return \NatePage\ToolCraft\Interfaces\ToolCraftCommandInterface
      */

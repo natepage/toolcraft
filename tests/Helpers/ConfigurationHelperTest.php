@@ -45,29 +45,6 @@ class ConfigurationHelperTest extends TestCase
     }
 
     /**
-     * Helper should return an empty array if no tool prefix provided with options in configuration.
-     *
-     * @return void
-     */
-    public function testGetToolsIdWithNoToolPrefix(): void
-    {
-        self::assertEmpty((new ConfigurationHelper($this->getConfiguration()))->getToolsId());
-    }
-
-    /**
-     * Helper should return an array with all tool prefixes provided with options in configuration.
-     *
-     * @return void
-     */
-    public function testGetToolsIdWithToolsPrefix(): void
-    {
-        $configuration = $this->getConfiguration();
-        $configuration->addOption(new ConfigurationOption('with_tool'), 'tool');
-
-        self::assertEquals(['tool'], (new ConfigurationHelper($configuration))->getToolsId());
-    }
-
-    /**
      * Helper should throw invalid configuration option exception when trying to get option which doesn't exist.
      *
      * @return void
@@ -98,7 +75,7 @@ class ConfigurationHelperTest extends TestCase
     /**
      * Get options for tests.
      *
-     * @return \NatePage\ToolCraft\ConfigurationOption[]
+     * @return \NatePage\ToolCraft\Interfaces\ConfigurationInterface
      */
     private function getConfiguration(): ConfigurationInterface
     {

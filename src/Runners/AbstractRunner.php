@@ -5,7 +5,7 @@ namespace NatePage\ToolCraft\Runners;
 
 use NatePage\ToolCraft\Exceptions\RequireRunnerToBeStartedException;
 use NatePage\ToolCraft\Interfaces\ConsoleAwareInterface;
-use NatePage\ToolCraft\Interfaces\RunnerInterface;
+use NatePage\ToolCraft\Interfaces\Runners\RunnerInterface;
 use NatePage\ToolCraft\Traits\ConsoleAwareTrait;
 
 abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
@@ -21,6 +21,44 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
      * @var bool
      */
     protected $successful = true;
+
+    /**
+     * @var string
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * AbstractRunner constructor.
+     *
+     * @param string $id
+     * @param string $name
+     */
+    public function __construct(string $id, string $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     /**
      * Check if running.
@@ -45,7 +83,7 @@ abstract class AbstractRunner implements ConsoleAwareInterface, RunnerInterface
     /**
      * Start runner instance.
      *
-     * @return \NatePage\ToolCraft\Interfaces\RunnerInterface
+     * @return \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface
      */
     public function start(): RunnerInterface
     {

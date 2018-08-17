@@ -5,11 +5,9 @@ namespace NatePage\ToolCraft;
 
 use NatePage\ToolCraft\Helpers\ConfigurationHelper;
 use NatePage\ToolCraft\Helpers\OutputHelper;
-use NatePage\ToolCraft\Interfaces\AggregateRunnerInterface;
 use NatePage\ToolCraft\Interfaces\ConfigurationInterface;
 use NatePage\ToolCraft\Interfaces\ConsoleAwareInterface;
-use NatePage\ToolCraft\Interfaces\RunnerInterface;
-use NatePage\ToolCraft\Interfaces\ToolCollectionInterface;
+use NatePage\ToolCraft\Interfaces\Runners\RunnerInterface;
 use NatePage\ToolCraft\Interfaces\ToolCraftCommandInterface;
 use NatePage\ToolCraft\Runners\ChainRunner;
 use Symfony\Component\Console\Command\Command;
@@ -24,31 +22,23 @@ class ToolCraftCommand extends Command implements ToolCraftCommandInterface
     private $configuration;
 
     /**
-     * @var \NatePage\ToolCraft\Interfaces\AggregateRunnerInterface
+     * @var \NatePage\ToolCraft\Interfaces\Runners\AggregateRunnerInterface
      */
     private $runner;
-
-    /**
-     * @var \NatePage\ToolCraft\Interfaces\ToolCollectionInterface
-     */
-    private $tools;
 
     /**
      * ToolCraftCommand constructor.
      *
      * @param string $name
      * @param \NatePage\ToolCraft\Interfaces\ConfigurationInterface|null $configuration
-     * @param \NatePage\ToolCraft\Interfaces\ToolCollectionInterface|null $tools
-     * @param \NatePage\ToolCraft\Interfaces\AggregateRunnerInterface|null $runner
+     * @param \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface|null $runner
      */
     public function __construct(
         string $name,
         ?ConfigurationInterface $configuration = null,
-        ?ToolCollectionInterface $tools = null,
-        ?AggregateRunnerInterface $runner = null
+        ?RunnerInterface $runner = null
     ) {
         $this->configuration = $configuration ?? new Configuration();
-        $this->tools = $tools ?? new ToolCollection();
         $this->runner = $runner ?? new ChainRunner();
 
         parent::__construct($name);
@@ -71,27 +61,13 @@ class ToolCraftCommand extends Command implements ToolCraftCommandInterface
     /**
      * Set runner.
      *
-     * @param \NatePage\ToolCraft\Interfaces\RunnerInterface $runner
+     * @param \NatePage\ToolCraft\Interfaces\Runners\RunnerInterface $runner
      *
      * @return \NatePage\ToolCraft\Interfaces\ToolCraftCommandInterface
      */
     public function setRunner(RunnerInterface $runner): ToolCraftCommandInterface
     {
         $this->runner = $runner;
-
-        return $this;
-    }
-
-    /**
-     * Set tools.
-     *
-     * @param \NatePage\ToolCraft\Interfaces\ToolCollectionInterface $tools
-     *
-     * @return \NatePage\ToolCraft\Interfaces\ToolCraftCommandInterface
-     */
-    public function setTools(ToolCollectionInterface $tools): ToolCraftCommandInterface
-    {
-        $this->tools = $tools;
 
         return $this->doConfigure();
     }
@@ -116,6 +92,7 @@ class ToolCraftCommand extends Command implements ToolCraftCommandInterface
      * {@inheritdoc}
      *
      * @throws \NatePage\ToolCraft\Exceptions\InvalidConfigurationOptionException
+     * @throws \NatePage\ToolCraft\Exceptions\RequiredPropertyMissingException
      */
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
@@ -123,28 +100,10 @@ class ToolCraftCommand extends Command implements ToolCraftCommandInterface
         $outputHelper = $this->getOutputHelper($input, $output);
 
         // Update configuration with input from user
-        $configurationHelper
-            ->merge($input->getOptions())
-            ->updateToolsState();
+        $configurationHelper->merge($input->getOptions());
 
         // Display config if asked
         $outputHelper->config($configurationHelper);
-
-        // If no tools to run, skip
-        if ($this->tools->isEmpty()) {
-            $outputHelper->warning('No tools to run');
-
-            return RunnerInterface::EXIT_CODE_SUCCESS;
-        }
-
-        // If tool is enabled, add its runner to aggregate
-        foreach ($this->tools->all() as $tool) {
-            if ($configurationHelper->isToolEnabled($tool->getId()) === false) {
-                continue;
-            }
-
-            $this->runner->addRunner($tool->getRunner());
-        }
 
         // If runner is aware of the console, give it input and output
         if ($this->runner instanceof ConsoleAwareInterface) {
@@ -177,7 +136,7 @@ class ToolCraftCommand extends Command implements ToolCraftCommandInterface
     {
         $this
             ->getConfigurationHelper()
-            ->registerTools($this->tools)
+            ->handleRunnerOptions($this->runner)
             ->addCommandOptions($this);
 
         return $this;
